@@ -33,7 +33,7 @@ group :development, :test do
   gem "factory_bot", "6.5.6"
   gem "faker", "3.6.1"
   gem "minitest", "6.0.2"
-  gem "rubocop", "1.85.1", require: false
+  gem "rubocop", "1.86.0", require: false
   gem "rubocop-capybara", "2.22.1", require: false
   gem "rubocop-factory_bot", "2.28.0", require: false
   gem "rubocop-minitest", "0.39.1", require: false
