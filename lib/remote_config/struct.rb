@@ -8,7 +8,9 @@ class RemoteConfig::Struct < T::Struct
   end
 
   class BlockConfig < T::Struct
-    const :message, String
+    const :title, String
+    const :text, String
+    const :emoji, T.nilable(String), default: nil
     const :button, T.nilable(Button), default: nil
   end
 

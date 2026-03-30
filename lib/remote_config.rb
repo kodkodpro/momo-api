@@ -42,6 +42,11 @@ module RemoteConfig
       result.payload
     end
 
+    sig { void }
+    def reset!
+      REDIS.del(REDIS_KEY)
+    end
+
     sig { returns(T::Hash[Symbol, T.untyped]) }
     def to_h
       result = load.serialize_to(:hash, options: { should_serialize_values: true })
@@ -86,11 +91,10 @@ module RemoteConfig
 
     sig { params(hash: T::Hash[Symbol, T.untyped]).returns(Struct::BlockConfig) }
     def deserialize_block_config(hash)
-      if hash[:button].is_a?(Hash)
-        hash = hash.merge(button: Struct::Button.new(**hash[:button]))
-      end
+      result = Struct::BlockConfig.deserialize_from(:hash, hash)
+      raise result.error.message if result.failure?
 
-      Struct::BlockConfig.new(**T.unsafe(hash))
+      result.payload
     end
 
     sig { params(name: Symbol).void }
