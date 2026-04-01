@@ -32,7 +32,7 @@ group :development, :test do
   gem "dotenv", "3.2.0"
   gem "factory_bot", "6.5.6"
   gem "faker", "3.6.1"
-  gem "minitest", "6.0.2"
+  gem "minitest", "6.0.3"
   gem "rubocop", "1.85.1", require: false
   gem "rubocop-capybara", "2.22.1", require: false
   gem "rubocop-factory_bot", "2.28.0", require: false
