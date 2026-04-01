@@ -42,7 +42,7 @@ group :development, :test do
   gem "rubocop-sane", github: "akodkod/rubocop-sane", require: false
   gem "rubocop-sorbet", "0.12.0", require: false
   gem "rubocop-thread_safety", "0.7.3", require: false
-  gem "ruby-lsp", "0.26.8"
+  gem "ruby-lsp", "0.26.9"
   gem "spy", "1.0.5", require: false
   gem "webmock", "3.26.2", require: false
 end
