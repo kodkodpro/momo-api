@@ -2,67 +2,36 @@
 # frozen_string_literal: true
 
 module Analytics::Properties
-  class AppOpen < T::Struct
-    const :source, T.nilable(String), default: nil
-  end
+  class Empty < T::Struct; end
 
-  class MessageSent < T::Struct
-    const :conversation_id, String
-    const :message_length, Integer
-    const :has_attachment, T.nilable(T::Boolean), default: false
-  end
-
-  class MessageReceived < T::Struct
-    const :conversation_id, String
-    const :response_time_ms, T.nilable(Integer), default: nil
-  end
-
-  class RecordingStarted < T::Struct
-    const :conversation_id, String
+  class OnboardingStepViewed < T::Struct
+    const :step, String
   end
 
   class RecordingStopped < T::Struct
-    const :conversation_id, String
     const :duration_ms, Integer
   end
 
-  class ConversationCreated < T::Struct
-    const :conversation_id, String
+  class ScreenViewed < T::Struct
+    const :screen, String
   end
 
-  class ConversationDeleted < T::Struct
-    const :conversation_id, String
+  class AIRequestCompleted < T::Struct
+    const :name, String
+    const :model, String
+    const :input_tokens, Integer
+    const :output_tokens, Integer
   end
 
-  class SubscriptionPurchased < T::Struct
-    const :plan, String
-    const :price_cents, Integer
+  class NotificationsGenerated < T::Struct
+    const :count, Integer
   end
 
-  class ErrorOccurred < T::Struct
-    const :error_type, String
-    const :error_message, T.nilable(String), default: nil
+  class ButtonTapped < T::Struct
+    const :name, String
   end
 
-  class Empty < T::Struct; end
-
-  SCHEMAS = T.let(
-    {
-      Analytics::EventName::AppOpen => AppOpen,
-      Analytics::EventName::AppBackground => Empty,
-      Analytics::EventName::MessageSent => MessageSent,
-      Analytics::EventName::MessageReceived => MessageReceived,
-      Analytics::EventName::RecordingStarted => RecordingStarted,
-      Analytics::EventName::RecordingStopped => RecordingStopped,
-      Analytics::EventName::ConversationCreated => ConversationCreated,
-      Analytics::EventName::ConversationDeleted => ConversationDeleted,
-      Analytics::EventName::SettingsOpened => Empty,
-      Analytics::EventName::SubscriptionViewed => Empty,
-      Analytics::EventName::SubscriptionPurchased => SubscriptionPurchased,
-      Analytics::EventName::OnboardingStarted => Empty,
-      Analytics::EventName::OnboardingCompleted => Empty,
-      Analytics::EventName::ErrorOccurred => ErrorOccurred,
-    }.freeze,
-    T::Hash[Analytics::EventName, T.class_of(T::Struct)],
-  )
+  class PermissionResult < T::Struct
+    const :granted, T::Boolean
+  end
 end

@@ -1,44 +1,41 @@
 # typed: true
 # frozen_string_literal: true
 
-class Analytics::IngestService
-  Result = ::Struct.new(:inserted_count, :errors)
+class Analytics::IngestService < ApplicationService
+  # Arguments
+  arg :user, type: User
+  arg :events, type: Array
 
-  sig { params(user: User, events: T::Array[T::Hash[String, T.untyped]]).returns(Result) }
-  def self.call(user:, events:)
+  private
+
+  def run
+    created_at = Time.current
+
     rows = []
-    errors = []
-    now = Time.current
+    event_errors = []
 
     events.each_with_index do |event_hash, index|
       name = event_hash["name"]
-      raw_properties = event_hash["properties"] || {}
-      properties = raw_properties.respond_to?(:to_unsafe_h) ? raw_properties.to_unsafe_h : raw_properties.to_h
-      occurred_at = event_hash["occurred_at"]
+      properties = event_hash["properties"] || {}
 
-      # Validate event name
       enum_value = begin
         Analytics::EventName.deserialize(name)
       rescue KeyError
-        errors << { index:, name:, error: "unknown event name" }
+        event_errors << { index:, name:, error: "unknown event name" }
         next
       end
-
-      # Validate occurred_at
-      timestamp = begin
-        Time.zone.parse(occurred_at.to_s)
-      rescue ArgumentError, TypeError
-        errors << { index:, name:, error: "invalid or missing occurred_at" }
-        next
-      end
-
-      # Validate properties against schema
-      struct_class = Analytics::Properties::SCHEMAS[enum_value]
 
       begin
-        T.must(struct_class).new(**properties.to_h.symbolize_keys)
+        enum_value.properties_schema.new(**properties.symbolize_keys)
       rescue ArgumentError, TypeError => e
-        errors << { index:, name:, error: "invalid properties: #{e.message}" }
+        event_errors << { index:, name:, error: "invalid properties: #{e.message}" }
+        next
+      end
+
+      occurred_at = begin
+        Time.zone.parse(event_hash["occurred_at"].to_s)
+      rescue ArgumentError, TypeError
+        event_errors << { index:, name:, error: "invalid or missing occurred_at" }
         next
       end
 
@@ -46,13 +43,11 @@ class Analytics::IngestService
         user_id: user.id,
         name:,
         properties:,
-        occurred_at: timestamp,
-        created_at: now,
+        occurred_at:,
+        created_at:,
       }
     end
 
-    AnalyticsEvent.insert_all(rows) if rows.any? # rubocop:disable Rails/SkipsModelValidations
-
-    Result.new(inserted_count: rows.size, errors:)
+    AnalyticsEvent.insert_all(rows, returning: false) if rows.any? # rubocop:disable Rails/SkipsModelValidations
   end
 end

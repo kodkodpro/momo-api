@@ -4,7 +4,7 @@
 FactoryBot.define do
   factory :analytics_event do
     user
-    name { 0 }
+    name { 1 }
     properties { {} }
     occurred_at { Time.current }
   end

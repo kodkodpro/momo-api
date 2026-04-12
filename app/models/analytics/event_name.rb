@@ -3,19 +3,42 @@
 
 class Analytics::EventName < T::Enum
   enums do
-    AppOpen = new(0)
-    AppBackground = new(1)
-    MessageSent = new(2)
-    MessageReceived = new(3)
-    RecordingStarted = new(4)
-    RecordingStopped = new(5)
-    ConversationCreated = new(6)
-    ConversationDeleted = new(7)
-    SettingsOpened = new(8)
-    SubscriptionViewed = new(9)
-    SubscriptionPurchased = new(10)
-    OnboardingStarted = new(11)
-    OnboardingCompleted = new(12)
-    ErrorOccurred = new(13)
+    AppOpened = new(1)
+    AppClosed = new(2)
+    OnboardingStarted = new(3)
+    OnboardingCompleted = new(4)
+    OnboardingStepViewed = new(5)
+    RecordingStarted = new(6)
+    RecordingStopped = new(7)
+    RecordingPaused = new(8)
+    RecordingResumed = new(9)
+    MemoCreated = new(10)
+    MemoUpdated = new(11)
+    MemoDeleted = new(12)
+    MemoViewed = new(13)
+    MemoRecordingPlayed = new(14)
+    TagCreated = new(15)
+    TagUpdated = new(16)
+    TagDeleted = new(17)
+    ScreenViewed = new(18)
+    AIRequestCompleted = new(19)
+    NotificationsGenerated = new(20)
+    NotificationOpened = new(21)
+    ButtonTapped = new(22)
+    MicPermissionResult = new(23)
+    NotificationsPermissionResult = new(24)
+  end
+
+  def properties_schema
+    case self
+    when OnboardingStepViewed then Analytics::Properties::OnboardingStepViewed
+    when RecordingStopped then Analytics::Properties::RecordingStopped
+    when ScreenViewed then Analytics::Properties::ScreenViewed
+    when AIRequestCompleted then Analytics::Properties::AIRequestCompleted
+    when NotificationsGenerated then Analytics::Properties::NotificationsGenerated
+    when ButtonTapped then Analytics::Properties::ButtonTapped
+    when MicPermissionResult, NotificationsPermissionResult then Analytics::Properties::PermissionResult
+    else Analytics::Properties::Empty
+    end
   end
 end

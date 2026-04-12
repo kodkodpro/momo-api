@@ -3,25 +3,20 @@
 
 class AnalyticsController < ApplicationController
   def create
-    result = Analytics::IngestService.call(user: T.must(current_user), events: event_params)
+    Analytics::IngestService.run!(user: T.must(current_user), events: event_params)
 
-    render json: {
-             status: :ok,
-             inserted: result.inserted_count,
-             errors: result.errors,
-           },
-           status: :created
+    render json: { status: :created }, status: :created
   end
 
   private
 
   def event_params
-    Array(params[:events]).map do |e|
-      {
-        "name" => e[:name],
-        "occurred_at" => e[:occurred_at],
-        "properties" => e[:properties]&.permit!.to_h,
-      }
+    return [] unless params[:events].is_a?(Array)
+    
+    params[:events].map do |event|
+      event
+        .to_unsafe_h
+        .deep_transform_keys(&:underscore)
     end
   end
 end
