@@ -12,7 +12,7 @@ class AnalyticsController < ApplicationController
 
   def event_params
     return [] unless params[:events].is_a?(Array)
-    
+
     params[:events].map do |event|
       event
         .to_unsafe_h

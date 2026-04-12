@@ -89,6 +89,42 @@ class AnalyticsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 100, event.properties["input_tokens"]
   end
 
+  test "reports failed events to Sentry" do
+    spy = Spy.on(Sentry, :capture_message)
+
+    params = {
+      events: [
+        name: 999, occurred_at: Time.current.iso8601, properties: {},
+      ],
+    }
+
+    post analytics_url,
+         params:,
+         headers: auth_headers,
+         as: :json
+
+    assert_response :created
+    assert_spy_called(spy)
+  end
+
+  test "does not report to Sentry when all events are valid" do
+    spy = Spy.on(Sentry, :capture_message)
+
+    params = {
+      events: [
+        name: 1, occurred_at: Time.current.iso8601, properties: {},
+      ],
+    }
+
+    post analytics_url,
+         params:,
+         headers: auth_headers,
+         as: :json
+
+    assert_response :created
+    assert_spy_not_called(spy)
+  end
+
   test "requires authentication" do
     assert_raises(RuntimeError) do
       post analytics_url,

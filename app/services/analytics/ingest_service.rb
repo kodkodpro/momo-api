@@ -49,5 +49,13 @@ class Analytics::IngestService < ApplicationService
     end
 
     AnalyticsEvent.insert_all(rows, returning: false) if rows.any? # rubocop:disable Rails/SkipsModelValidations
+
+    return if event_errors.empty?
+
+    Sentry.capture_message(
+      "Analytics events failed to save",
+      level: :warning,
+      extra: { errors: event_errors, user_id: user.id },
+    )
   end
 end

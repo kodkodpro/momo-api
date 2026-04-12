@@ -8,6 +8,7 @@ class Analytics::EventName < T::Enum
     OnboardingStarted = new(3)
     OnboardingCompleted = new(4)
     OnboardingStepViewed = new(5)
+    OnboardingBackTapped = new(25)
     RecordingStarted = new(6)
     RecordingStopped = new(7)
     RecordingPaused = new(8)
@@ -31,7 +32,7 @@ class Analytics::EventName < T::Enum
 
   def properties_schema
     case self
-    when OnboardingStepViewed then Analytics::Properties::OnboardingStepViewed
+    when OnboardingStepViewed, OnboardingBackTapped then Analytics::Properties::OnboardingStepViewed
     when RecordingStopped then Analytics::Properties::RecordingStopped
     when ScreenViewed then Analytics::Properties::ScreenViewed
     when AIRequestCompleted then Analytics::Properties::AIRequestCompleted
