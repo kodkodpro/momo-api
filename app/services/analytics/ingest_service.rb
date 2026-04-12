@@ -52,6 +52,8 @@ class Analytics::IngestService < ApplicationService
 
     return if event_errors.empty?
 
+    Rails.logger.warn("Analytics events failed to save: #{event_errors.inspect} (user_id: #{user.id})")
+
     Sentry.capture_message(
       "Analytics events failed to save",
       level: :warning,
