@@ -11,8 +11,4 @@ Dir[File.join(File.dirname(__FILE__), "support", "**", "*.rb")].each { |file| re
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
   parallelize workers: :number_of_processors
-
-  parallelize_setup do |worker|
-    REDIS.select(worker)
-  end
 end

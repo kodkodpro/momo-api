@@ -94,6 +94,31 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
+  test "forwards multipart/form-data POST requests" do
+    stub_request(:post, "#{@openai_base}/v1/audio/transcriptions")
+      .to_return(status: 200, body: '{"text":"hello"}', headers: { "Content-Type" => "application/json" })
+
+    boundary = "----TestBoundary1234"
+    multipart_body = [
+      "--#{boundary}",
+      'Content-Disposition: form-data; name="model"',
+      "",
+      "whisper-1",
+      "--#{boundary}",
+      'Content-Disposition: form-data; name="language"',
+      "",
+      "uk",
+      "--#{boundary}--",
+    ].join("\r\n")
+
+    post proxy_openai_url(path: "v1/audio/transcriptions"),
+         params: multipart_body,
+         headers: auth_headers.merge("Content-Type" => "multipart/form-data; boundary=#{boundary}")
+
+    assert_response :success
+    assert_equal '{"text":"hello"}', response.body
+  end
+
   test "returns upstream 500 error as-is" do
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 500, body: '{"error":"internal server error"}')

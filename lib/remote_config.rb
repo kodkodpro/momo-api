@@ -2,99 +2,53 @@
 # frozen_string_literal: true
 
 module RemoteConfig
-  REDIS_KEY = "remote-config"
+  CACHE_KEY = "remote-config"
   BLOCKS = T.let([:block_app, :block_recording].freeze, T::Array[Symbol])
 
   class << self
-    extend T::Sig
+    # Delegates
+    delegate :to_h, to: :load
 
     sig { params(name: Symbol, config: T.any(Struct::BlockConfig, T::Hash[Symbol, T.untyped])).void }
     def block(name, config)
       validate_block!(name)
-      config = deserialize_block_config(config) if config.is_a?(Hash)
+      config = Struct::BlockConfig.deserialize_from!(:hash, config) if config.is_a?(Hash)
 
-      current = load
-      hash = serialize(current)
-      hash[name] = serialize_block_config(config)
+      hash = load.to_h
+      hash[name] = config.to_h
 
-      save(deserialize(hash))
+      save(RemoteConfig::Struct.deserialize_from!(:hash, hash))
     end
 
     sig { params(name: Symbol).void }
     def unblock(name)
       validate_block!(name)
 
-      current = load
-      hash = serialize(current)
+      hash = load.to_h
       hash.delete(name)
 
-      save(deserialize(hash))
+      save(RemoteConfig::Struct.deserialize_from!(:hash, hash))
     end
 
     sig { returns(RemoteConfig::Struct) }
     def load
-      json = REDIS.get(REDIS_KEY)
+      json = Rails.cache.read(CACHE_KEY)
       return RemoteConfig::Struct.new unless json
 
-      result = RemoteConfig::Struct.deserialize_from(:json, json)
-      raise result.error.message if result.failure?
-
-      result.payload
+      RemoteConfig::Struct.deserialize_from!(:json, json)
     end
 
     sig { void }
     def reset!
-      REDIS.del(REDIS_KEY)
-    end
-
-    sig { returns(T::Hash[Symbol, T.untyped]) }
-    def to_h
-      result = load.serialize_to(:hash, options: { should_serialize_values: true })
-      raise result.error.message if result.failure?
-
-      T.unsafe(result.payload)
+      Rails.cache.delete(CACHE_KEY)
     end
 
     private
 
     sig { params(config: RemoteConfig::Struct).void }
     def save(config)
-      result = config.serialize_to(:json, options: { should_serialize_values: true })
-      raise result.error.message if result.failure?
-
-      REDIS.set(REDIS_KEY, result.payload)
-    end
-
-    sig { params(config: RemoteConfig::Struct).returns(T::Hash[Symbol, T.untyped]) }
-    def serialize(config)
-      result = config.serialize_to(:hash, options: { should_serialize_values: true })
-      raise result.error.message if result.failure?
-
-      T.unsafe(result.payload)
-    end
-
-    sig { params(hash: T::Hash[Symbol, T.untyped]).returns(RemoteConfig::Struct) }
-    def deserialize(hash)
-      result = RemoteConfig::Struct.deserialize_from(:hash, hash)
-      raise result.error.message if result.failure?
-
-      result.payload
-    end
-
-    sig { params(config: Struct::BlockConfig).returns(T::Hash[Symbol, T.untyped]) }
-    def serialize_block_config(config)
-      result = config.serialize_to(:hash, options: { should_serialize_values: true })
-      raise result.error.message if result.failure?
-
-      T.unsafe(result.payload)
-    end
-
-    sig { params(hash: T::Hash[Symbol, T.untyped]).returns(Struct::BlockConfig) }
-    def deserialize_block_config(hash)
-      result = Struct::BlockConfig.deserialize_from(:hash, hash)
-      raise result.error.message if result.failure?
-
-      result.payload
+      json = config.serialize_to!(:json, options: { should_serialize_values: true })
+      Rails.cache.write(CACHE_KEY, json)
     end
 
     sig { params(name: Symbol).void }

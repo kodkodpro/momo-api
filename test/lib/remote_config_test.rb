@@ -5,7 +5,7 @@ require "test_helper"
 
 class RemoteConfigTest < ActiveSupport::TestCase
   setup do
-    REDIS.del(RemoteConfig::REDIS_KEY)
+    RemoteConfig.reset!
   end
 
   test "block sets a block with title and text only" do

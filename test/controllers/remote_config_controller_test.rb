@@ -5,7 +5,7 @@ require "test_helper"
 
 class RemoteConfigControllerTest < ActionDispatch::IntegrationTest
   setup do
-    REDIS.del(RemoteConfig::REDIS_KEY)
+    RemoteConfig.reset!
   end
 
   test "returns empty config when nothing is set" do

@@ -14,7 +14,7 @@ class ProxyController < ApplicationController
   private
 
   def build_target_uri
-    target = "#{Env.openai_api_url}/#{params[:path]}"
+    target = "#{Env.openai_api_url}/#{request.path_parameters[:path]}"
     target += "?#{request.query_string}" if request.query_string.present?
     URI.parse(target)
   end
@@ -25,7 +25,7 @@ class ProxyController < ApplicationController
 
     req = net_http_request_class.new(uri)
     req["Authorization"] = "Bearer #{Env.openai_api_key}"
-    req["Content-Type"] = request.content_type if request.content_type
+    req["Content-Type"] = request.headers["Content-Type"] if request.headers["Content-Type"]
     req["Accept"] = request.headers["Accept"] if request.headers["Accept"]
     req.body = request.raw_post if request.post? || request.put? || request.patch?
 
