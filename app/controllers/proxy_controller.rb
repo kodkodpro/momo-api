@@ -6,6 +6,8 @@ class ProxyController < ApplicationController
     uri = build_target_uri
     upstream = execute_request(uri)
 
+    notify_sentry(upstream) unless upstream.is_a?(Net::HTTPSuccess)
+
     render body: upstream.body,
            status: upstream.code.to_i,
            content_type: upstream["Content-Type"]
@@ -30,6 +32,14 @@ class ProxyController < ApplicationController
     req.body = request.raw_post if request.post? || request.put? || request.patch?
 
     http.request(req)
+  end
+
+  def notify_sentry(upstream)
+    Sentry.capture_message(
+      "OpenAI Proxy Error",
+      level: :error,
+      extra: { status: upstream.code.to_i, body: upstream.body, path: request.path },
+    )
   end
 
   def net_http_request_class

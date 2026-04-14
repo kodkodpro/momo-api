@@ -127,4 +127,26 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :internal_server_error
   end
+
+  test "notifies Sentry on non-successful upstream response" do
+    spy = Spy.on(Sentry, :capture_message)
+
+    stub_request(:get, "#{@openai_base}/v1/models")
+      .to_return(status: 500, body: '{"error":"internal server error"}')
+
+    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+
+    assert_spy_called spy
+  end
+
+  test "does not notify Sentry on successful upstream response" do
+    spy = Spy.on(Sentry, :capture_message)
+
+    stub_request(:get, "#{@openai_base}/v1/models")
+      .to_return(status: 200, body: '{"data":[]}', headers: { "Content-Type" => "application/json" })
+
+    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+
+    assert_spy_not_called spy
+  end
 end

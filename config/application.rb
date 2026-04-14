@@ -19,9 +19,9 @@ require "action_view/railtie"
 
 require "rails/test_unit/railtie"
 
+require_relative "initializers/sorbet"
 require_relative "../lib/env"
 require_relative "../lib/fren"
-require_relative "initializers/sorbet"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -41,9 +41,8 @@ class Fren::Application < Rails::Application
   # Common ones are `templates`, `generators`, or `middleware`, for example.
   config.autoload_lib(ignore: ["assets", "tasks"])
 
-  # remember
   # Set default log level to info.
-  # config.log_level = :info
+  config.log_level = :info
 
   # Configuration for the application, engines, and railties goes here.
   #
