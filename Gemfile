@@ -19,7 +19,7 @@ gem "thruster", "0.1.20", require: false
 gem "wannabe_bool", "0.7.1"
 
 gem "sorbet-schema", "0.9.3"
-gem "sorbet-static-and-runtime", "0.6.13117"
+gem "sorbet-static-and-runtime", "0.6.13143"
 gem "tapioca", "0.18.0", require: false, group: [:development, :test]
 
 group :development, :test do
@@ -30,8 +30,8 @@ group :development, :test do
   gem "debug", "1.11.1"
   gem "dotenv", "3.2.0"
   gem "factory_bot", "6.5.6"
-  gem "faker", "3.6.1"
-  gem "minitest", "6.0.3"
+  gem "faker", "3.8.0"
+  gem "minitest", "6.0.4"
   gem "rubocop", "1.86.1", require: false
   gem "rubocop-capybara", "2.22.1", require: false
   gem "rubocop-factory_bot", "2.28.0", require: false
