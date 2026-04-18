@@ -7,6 +7,7 @@ class ApplicationController < ActionController::API
 
   # Callbacks
   before_action :authenticate_user!
+  before_action :set_sentry_user
 
   private
 
@@ -23,5 +24,13 @@ class ApplicationController < ActionController::API
     raise "X-User-Id header must be a valid UUID" unless user_id.match?(uuid_regex)
 
     self.current_user = User.find_or_create_by!(id: user_id)
+  end
+
+  sig { void }
+  def set_sentry_user
+    current_user = self.current_user
+    return unless current_user
+
+    Sentry.set_user(id: current_user.id)
   end
 end
