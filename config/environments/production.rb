@@ -46,8 +46,17 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Use Redis as the cache store in production.
-  config.cache_store = :redis_cache_store, { url: Env.redis_url }
+  # Replace the default in-process memory cache store with a durable alternative.
+  config.cache_store = :redis_cache_store, {
+    url: Env.redis_url,
+    error_handler: -> (method:, returning:, exception:) {
+      Sentry.capture_exception(
+        exception,
+        level: :warning,
+        tags: { rails_cache_method: method, rails_cache_returning: returning },
+      )
+    },
+  }
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # config.active_job.queue_adapter = :resque

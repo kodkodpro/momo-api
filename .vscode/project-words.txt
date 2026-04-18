@@ -3,8 +3,10 @@ annotaterb
 autocorrection
 bootsnap
 dotenv
+elevenlabs
 ELEVENLABS
 Fren
+healthcheck
 jemalloc
 Kamal
 libjemalloc
@@ -15,4 +17,6 @@ pidfile
 pids
 rescuable
 rubocop
+safelist
+safelisted
 shoulda
