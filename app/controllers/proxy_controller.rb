@@ -3,30 +3,47 @@
 
 class ProxyController < ApplicationController
   def openai
-    uri = build_target_uri
-    upstream = execute_request(uri)
+    proxy(
+      base_url: Env.openai_api_url,
+      auth_header: ["Authorization", "Bearer #{Env.openai_api_key}"],
+      service: "OpenAI",
+    )
+  end
 
-    notify_sentry(upstream) unless upstream.is_a?(Net::HTTPSuccess)
+  def elevenlabs
+    proxy(
+      base_url: Env.elevenlabs_api_url,
+      auth_header: ["xi-api-key", Env.elevenlabs_api_key],
+      service: "ElevenLabs",
+    )
+  end
+
+  private
+
+  def proxy(base_url:, auth_header:, service:)
+    uri = build_target_uri(base_url)
+    upstream = execute_request(uri, auth_header:)
+
+    notify_sentry(upstream, service:) unless upstream.is_a?(Net::HTTPSuccess)
 
     render body: upstream.body,
            status: upstream.code.to_i,
            content_type: upstream["Content-Type"]
   end
 
-  private
-
-  def build_target_uri
-    target = "#{Env.openai_api_url}/#{request.path_parameters[:path]}"
+  def build_target_uri(base_url)
+    target = "#{base_url}/#{request.path_parameters[:path]}"
     target += "?#{request.query_string}" if request.query_string.present?
     URI.parse(target)
   end
 
-  def execute_request(uri)
+  def execute_request(uri, auth_header:)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
 
     req = net_http_request_class.new(uri)
-    req["Authorization"] = "Bearer #{Env.openai_api_key}"
+    name, value = auth_header
+    req[name] = value
     req["Content-Type"] = request.headers["Content-Type"] if request.headers["Content-Type"]
     req["Accept"] = request.headers["Accept"] if request.headers["Accept"]
     req.body = request.raw_post if request.post? || request.put? || request.patch?
@@ -34,9 +51,9 @@ class ProxyController < ApplicationController
     http.request(req)
   end
 
-  def notify_sentry(upstream)
+  def notify_sentry(upstream, service:)
     Sentry.capture_message(
-      "OpenAI Proxy Error",
+      "#{service} Proxy Error",
       level: :error,
       extra: { status: upstream.code.to_i, body: upstream.body, path: request.path },
     )

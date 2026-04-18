@@ -2,8 +2,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # OpenAI
+  # Proxies
   match "proxy/openai/*path", to: "proxy#openai", via: :all, as: :proxy_openai
+  match "proxy/elevenlabs/*path", to: "proxy#elevenlabs", via: :all, as: :proxy_elevenlabs
 
   # Analytics
   resources :analytics, only: [:create]

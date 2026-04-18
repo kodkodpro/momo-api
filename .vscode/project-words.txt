@@ -3,6 +3,7 @@ annotaterb
 autocorrection
 bootsnap
 dotenv
+ELEVENLABS
 Fren
 jemalloc
 Kamal

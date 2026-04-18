@@ -137,6 +137,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     get proxy_openai_url(path: "v1/models"), headers: auth_headers
 
     assert_spy_called spy
+    assert_equal "OpenAI Proxy Error", spy.calls.first.args.first
   end
 
   test "does not notify Sentry on successful upstream response" do

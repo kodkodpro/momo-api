@@ -7,6 +7,8 @@ require "dotenv/load"
 class EnvConfig < T::Struct
   const :openai_api_url, String
   const :openai_api_key, String
+  const :elevenlabs_api_url, String
+  const :elevenlabs_api_key, String
   const :redis_url, T.nilable(String)
   const :sentry_dsn, T.nilable(String)
   const :sentry_environment, T.nilable(String)
