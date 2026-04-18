@@ -57,6 +57,8 @@ class ProxyController < ApplicationController
       level: :error,
       extra: { status: upstream.code.to_i, body: upstream.body, path: request.path },
     )
+
+    Rails.logger.error("[#{service} Proxy] Error #{upstream.code}: #{upstream.body}")
   end
 
   def net_http_request_class
