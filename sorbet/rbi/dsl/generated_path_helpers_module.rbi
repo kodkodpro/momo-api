@@ -13,6 +13,9 @@ module GeneratedPathHelpersModule
   def analytics_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def dashboard_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def feedbacks_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }

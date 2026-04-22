@@ -13,6 +13,9 @@ module GeneratedUrlHelpersModule
   def analytics_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def dashboard_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def feedbacks_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }

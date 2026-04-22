@@ -3,7 +3,7 @@
 
 class AnalyticsController < ApplicationController
   def create
-    Analytics::IngestService.run!(user: T.must(current_user), events: event_params)
+    Analytics::Ingest.run!(user: T.must(current_user), events: event_params)
 
     render json: { status: :created }, status: :created
   end

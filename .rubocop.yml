@@ -172,7 +172,7 @@ Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: diff_comma
 
 Style/ClassAndModuleChildren:
-  EnforcedStyle: compact
+  Enabled: false
 
 # TODO: Enable this rule when we create env file
 Style/FetchEnvVar:

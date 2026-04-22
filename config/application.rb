@@ -34,7 +34,7 @@ class Fren::Application < Rails::Application
   # Only loads a smaller set of middleware suitable for API only apps.
   # Middleware like session, flash, cookies can be added back manually.
   # Skip views, helpers and assets when generating a new resource.
-  config.api_only = true
+  # config.api_only = true
 
   # Please, add to the `ignore` list any other `lib` subdirectories that do
   # not contain `.rb` files, or that should not be reloaded or eager loaded.

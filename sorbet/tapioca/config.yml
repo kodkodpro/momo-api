@@ -2,3 +2,9 @@ gem:
   workers: 1
 dsl:
   workers: 1
+  exclude:
+    - ActiveRecordAssociations
+    - ActiveRecordColumns
+  compiler_options:
+    ActiveRecordAssociationTypes: persisted
+    ActiveRecordColumnTypes: persisted
