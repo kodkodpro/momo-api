@@ -19,6 +19,7 @@ AllCops:
   DisplayStyleGuide: true
   Exclude:
     - "bin/**/*"
+    - "vendor/**/*"
     - "sorbet/**/*.rbi"
     - "db/schema.rb"
 
