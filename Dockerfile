@@ -50,8 +50,6 @@ COPY . .
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
-ENV SECRET_KEY_BASE_DUMMY="1"
-
 # Precompile assets for production (Propshaft + Tailwind CSS).
 # Load placeholder values from .env.test so initializers that read ENV vars at
 # boot don't fail during the build. The file is removed afterward so it doesn't
