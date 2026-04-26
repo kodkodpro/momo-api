@@ -211,11 +211,11 @@ class Tapioca::Dsl::Compilers::PhlexSorbet < ::Tapioca::Dsl::Compiler
 
   private
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:100
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:106
   sig { returns(T::Array[::RBI::TypedParam]) }
   def build_params_signature; end
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:91
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:97
   sig { params(klass: ::RBI::Scope).void }
   def generate_initialize_method(klass); end
 
@@ -223,15 +223,15 @@ class Tapioca::Dsl::Compilers::PhlexSorbet < ::Tapioca::Dsl::Compiler
   # shadows `Class#new`, so without an override Sorbet ignores the typed
   # `initialize` above. Emit a typed `self.new` so call sites are checked.
   #
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:81
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:87
   sig { params(klass: ::RBI::Scope).void }
   def generate_new_method(klass); end
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:67
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:73
   sig { params(klass: ::RBI::Scope).void }
   def generate_props_method(klass); end
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:60
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:66
   sig { returns(T.nilable(T.class_of(T::Struct))) }
   def props_class; end
 
