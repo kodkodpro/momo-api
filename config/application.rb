@@ -28,20 +28,16 @@ require_relative "../lib/fren"
 Bundler.require(*Rails.groups)
 
 class Fren::Application < Rails::Application
-  # Initialize configuration defaults for originally generated Rails version.
+  # Initialize configuration defaults
   config.load_defaults 8.1
 
-  # Only loads a smaller set of middleware suitable for API only apps.
-  # Middleware like session, flash, cookies can be added back manually.
-  # Skip views, helpers and assets when generating a new resource.
-  config.api_only = true
+  # Load Sorbet types, structs and enums
+  config.autoload_paths << Rails.root.join("app/types")
 
-  # Please, add to the `ignore` list any other `lib` subdirectories that do
-  # not contain `.rb` files, or that should not be reloaded or eager loaded.
-  # Common ones are `templates`, `generators`, or `middleware`, for example.
-  config.autoload_lib(ignore: ["assets", "tasks"])
+  # Ignore autoloading for assets, tasks, and core_ext directories
+  config.autoload_lib(ignore: ["assets", "tasks", "core_ext"])
 
-  # Set default log level to info.
+  # Set default log level to info
   config.log_level = :info
 
   # Configuration for the application, engines, and railties goes here.

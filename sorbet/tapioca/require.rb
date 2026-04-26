@@ -1,4 +1,20 @@
 # typed: true
 # frozen_string_literal: true
 
-# Add your extra requires here (`bin/tapioca require` can be used to bootstrap this list)
+require "action_controller/railtie"
+require "action_view/railtie"
+require "active_model/railtie"
+require "active_record/railtie"
+require "active_support/core_ext/integer/time"
+require "bootsnap/setup"
+require "bundler/setup"
+require "dotenv/load"
+require "net/http"
+require "rails"
+require "rails/test_help"
+require "rails/test_unit/railtie"
+require "sorbet-runtime"
+require "sorbet-schema"
+require "spy/integration"
+require "tailwind_merge"
+require "webmock/minitest"

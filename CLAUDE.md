@@ -39,6 +39,29 @@ Rails 8.1 API-only app (Ruby 4.0.1, PostgreSQL) that serves as a reverse proxy f
 - **rubocop-sane** — custom RuboCop rules (github: akodkod/rubocop-sane)
 - **spy** — test spies/mocks; custom assertions in `test/support/spy.rb`
 
+### Views & components
+
+This app uses **Phlex** (`phlex-rails`, `phlex-sorbet`) for views/components and
+**RubyUI** (`ruby_ui`) as the design system. Detailed conventions and examples
+live in [`.claude/rules/phlex-rubyui.md`](.claude/rules/phlex-rubyui.md) — read
+that file before writing or editing anything under `app/views/` or
+`app/components/`.
+
+Key rules at a glance:
+
+- Pages inherit `Views::Base`; app components inherit `Components::Base`;
+  design-system primitives inherit `RubyUI::Base`.
+- Every component takes inputs via a nested `class Props < T::Struct` and
+  `include Phlex::Sorbet`.
+- Render RubyUI components as PascalCase method calls (`Heading`, `Text`,
+  `Card`, …) — they're auto-included via `Components::Base`.
+- **Prefer installing a RubyUI component over hand-writing one.** Use the CLI:
+  ```bash
+  bin/rails generate ruby_ui:component:all --pretend   # list all components
+  bin/rails generate ruby_ui:component <Name>          # install one
+  ```
+  Generated files land in `app/components/ruby_ui/<name>/` and are yours to edit.
+
 ### Environment config
 
 Typed env vars live in `lib/env.rb` as a `T::Struct` called `EnvConfig`. Access via the `Env` constant (e.g., `Env.openai_api_key`). Add new env vars there as typed properties.

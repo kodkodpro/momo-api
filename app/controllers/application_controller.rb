@@ -6,7 +6,7 @@ class ApplicationController < ActionController::API
   include Memery
 
   # Callbacks
-  before_action :authenticate_user!
+  before_action :current_user
   before_action :set_sentry_user
 
   # Error handling
@@ -14,26 +14,19 @@ class ApplicationController < ActionController::API
 
   private
 
-  # Getters / Setters
-  sig { returns(T.nilable(User)) }
-  attr_accessor :current_user
-
-  sig { void }
-  def authenticate_user!
+  sig { returns(User) }
+  memoize def current_user
     user_id = request.headers["X-User-Id"]&.strip
     raise Fren::AuthError, "X-User-Id header is required" if user_id.blank?
 
     uuid_regex = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
     raise Fren::AuthError, "X-User-Id header must be a valid UUID" unless user_id.match?(uuid_regex)
 
-    self.current_user = User.find_or_create_by!(id: user_id)
+    User.find_or_create_by!(id: user_id)
   end
 
   sig { void }
   def set_sentry_user
-    current_user = self.current_user
-    return unless current_user
-
     Sentry.set_user(id: current_user.id)
   end
 

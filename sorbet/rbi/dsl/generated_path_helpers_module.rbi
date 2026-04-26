@@ -13,6 +13,12 @@ module GeneratedPathHelpersModule
   def analytics_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def dashboard_analytics_analyze_event_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def dashboard_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def feedbacks_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
@@ -41,4 +47,13 @@ module GeneratedPathHelpersModule
 
   sig { params(args: T.untyped).returns(String) }
   def root_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def turbo_recede_historical_location_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def turbo_refresh_historical_location_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def turbo_resume_historical_location_path(*args); end
 end
