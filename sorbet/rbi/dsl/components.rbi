@@ -11,12 +11,23 @@ module Components
 
   sig do
     params(
+      class_name: T.nilable(::String),
       bordered: T::Boolean,
-      className: T.nilable(::String),
       block: T.nilable(T.proc.void)
     ).returns(T.untyped)
   end
-  def Card(bordered: T.unsafe(nil), className:, &block); end
+  def Card(class_name:, bordered: T.unsafe(nil), &block); end
+
+  sig do
+    params(
+      name: ::String,
+      label: ::String,
+      options: T::Array[[::String, ::String]],
+      selected: ::String,
+      block: T.nilable(T.proc.void)
+    ).returns(T.untyped)
+  end
+  def FilterSelect(name:, label:, options:, selected:, &block); end
 
   sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
   def Layout(*args, **kwargs, &block); end
@@ -27,12 +38,23 @@ module Components
 
     sig do
       params(
+        class_name: T.nilable(::String),
         bordered: T::Boolean,
-        className: T.nilable(::String),
         block: T.nilable(T.proc.void)
       ).returns(T.untyped)
     end
-    def Card(bordered: T.unsafe(nil), className:, &block); end
+    def Card(class_name:, bordered: T.unsafe(nil), &block); end
+
+    sig do
+      params(
+        name: ::String,
+        label: ::String,
+        options: T::Array[[::String, ::String]],
+        selected: ::String,
+        block: T.nilable(T.proc.void)
+      ).returns(T.untyped)
+    end
+    def FilterSelect(name:, label:, options:, selected:, &block); end
 
     sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
     def Layout(*args, **kwargs, &block); end
@@ -44,6 +66,10 @@ class Components::Base
 end
 
 class Components::Card
+  include Components
+end
+
+class Components::FilterSelect
   include Components
 end
 

@@ -20,7 +20,7 @@ class Time
   end
 end
 
-class DateTime
+class DateTime # rubocop:disable Style/OneClassPerFile
   extend T::Sig
 
   sig { returns(String) }
@@ -33,7 +33,7 @@ class DateTime
   end
 end
 
-class ActiveSupport::TimeWithZone
+class ActiveSupport::TimeWithZone # rubocop:disable Style/OneClassPerFile
   extend T::Sig
 
   sig { returns(String) }

@@ -9,7 +9,7 @@ class Views::Dashboard::Index < Views::Base
   end
 
   def view_template
-    h1 { "Dashboard::Index #{title}" }
+    h1 { "Dashboard::Index #{props.title}" }
     p { "Find me in app/views/dashboard/index.rb" }
   end
 end

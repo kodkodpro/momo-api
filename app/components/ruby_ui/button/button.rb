@@ -27,14 +27,14 @@ module RubyUI
 
     def size_classes
       if @icon
-        case @size
+        case @size # rubocop:disable Style/HashLikeCase
         when :sm then "h-6 w-6"
         when :md then "h-9 w-9"
         when :lg then "h-10 w-10"
         when :xl then "h-12 w-12"
         end
       else
-        case @size
+        case @size # rubocop:disable Style/HashLikeCase
         when :sm then "px-3 py-1.5 h-8 text-xs"
         when :md then "px-4 py-2 h-9 text-sm"
         when :lg then "px-4 py-2 h-10 text-base"

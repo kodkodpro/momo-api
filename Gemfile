@@ -20,15 +20,17 @@ gem "rack-attack", "6.8.0"
 gem "redis", "5.4.1"
 gem "sentry-rails", "6.5.0"
 gem "sentry-ruby", "6.5.0"
+gem "stimulus-rails", "1.3.4"
 gem "tailwindcss-rails", "4.4"
 gem "tailwind_merge", "1.4"
 gem "thruster", "0.1.20", require: false
+gem "turbo-rails", "2.0.23"
 gem "wannabe_bool", "0.7.1"
 
 # Custom-made
 gem "boba", github: "akodkod/boba" # With support for the latest Tapioca
 gem "operandi", github: "akodkod/operandi"
-gem "phlex-sorbet", path: "/Users/akodkod/Developer/Kodkod/phlex-sorbet"
+gem "phlex-sorbet", github: "akodkod/phlex-sorbet"
 
 gem "sorbet-schema", "0.9.3"
 gem "sorbet-static-and-runtime", "0.6.13143"

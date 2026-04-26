@@ -9,8 +9,8 @@ class Views::Dashboard::Index
   sig { params(title: ::String).void }
   def initialize(title:); end
 
-  sig { returns(::String) }
-  def title; end
+  sig { returns(Views::Dashboard::Index::Props) }
+  def props; end
 
   class << self
     sig { params(title: ::String).returns(T.attached_class) }

@@ -12,42 +12,12 @@ module RubyUI
   sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
   def Button(*args, **kwargs, &block); end
 
-  sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-  def Heading(*args, **kwargs, &block); end
-
-  sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-  def InlineCode(*args, **kwargs, &block); end
-
-  sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-  def InlineLink(*args, **kwargs, &block); end
-
-  sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-  def Text(*args, **kwargs, &block); end
-
-  sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-  def TypographyBlockquote(*args, **kwargs, &block); end
-
   class << self
     sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
     def Base(*args, **kwargs, &block); end
 
     sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
     def Button(*args, **kwargs, &block); end
-
-    sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-    def Heading(*args, **kwargs, &block); end
-
-    sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-    def InlineCode(*args, **kwargs, &block); end
-
-    sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-    def InlineLink(*args, **kwargs, &block); end
-
-    sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-    def Text(*args, **kwargs, &block); end
-
-    sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
-    def TypographyBlockquote(*args, **kwargs, &block); end
   end
 end
 
@@ -56,25 +26,5 @@ class RubyUI::Base
 end
 
 class RubyUI::Button
-  include RubyUI
-end
-
-class RubyUI::Heading
-  include RubyUI
-end
-
-class RubyUI::InlineCode
-  include RubyUI
-end
-
-class RubyUI::InlineLink
-  include RubyUI
-end
-
-class RubyUI::Text
-  include RubyUI
-end
-
-class RubyUI::TypographyBlockquote
   include RubyUI
 end

@@ -5,10 +5,10 @@
 # Please instead update this file by running `bin/tapioca gem phlex-sorbet`.
 
 
-# pkg:gem/phlex-sorbet#lib/phlex/sorbet/errors.rb:4
+# pkg:gem/phlex-sorbet#lib/phlex/sorbet/version.rb:3
 module Phlex; end
 
-# pkg:gem/phlex-sorbet#lib/phlex/sorbet/errors.rb:5
+# pkg:gem/phlex-sorbet#lib/phlex/sorbet/version.rb:4
 module Phlex::Sorbet
   mixes_in_class_methods ::Phlex::Sorbet::ClassMethods
 
@@ -17,7 +17,7 @@ module Phlex::Sorbet
     # Wires up class-level Props helpers and prepends an `initialize` that
     # builds a typed `Props` struct from incoming kwargs.
     #
-    # pkg:gem/phlex-sorbet#lib/phlex/sorbet.rb:30
+    # pkg:gem/phlex-sorbet#lib/phlex/sorbet.rb:31
     sig { params(base: T.untyped).void }
     def included(base); end
   end
@@ -77,12 +77,12 @@ class Phlex::Sorbet::Error < ::StandardError; end
 
 # Instance methods prepended into components that include Phlex::Sorbet.
 # Wraps `initialize` to build a typed Props struct from incoming kwargs
-# and exposes each prop as a method on the component instance.
+# and exposes it via the `props` accessor.
 #
 # pkg:gem/phlex-sorbet#lib/phlex/sorbet/instance_methods.rb:11
 module Phlex::Sorbet::InstanceMethods
-  # Builds typed props, defines per-prop accessor methods, then calls
-  # super so the Phlex base class can initialize as usual.
+  # Builds typed props, then calls super so the Phlex base class can
+  # initialize as usual.
   #
   # @param kwargs [Hash] Arguments matching the Props T::Struct
   # @raise [InvalidPropsError] if validation fails
@@ -92,18 +92,9 @@ module Phlex::Sorbet::InstanceMethods
 
   # Accessor for typed props.
   #
-  # pkg:gem/phlex-sorbet#lib/phlex/sorbet/instance_methods.rb:29
+  # pkg:gem/phlex-sorbet#lib/phlex/sorbet/instance_methods.rb:28
   sig { returns(T.nilable(::T::Struct)) }
   def props; end
-
-  private
-
-  # Define getter methods for each field in the Props struct.
-  # Allows direct access like `user_id` instead of `props.user_id`.
-  #
-  # pkg:gem/phlex-sorbet#lib/phlex/sorbet/instance_methods.rb:40
-  sig { void }
-  def define_prop_accessors; end
 end
 
 # Raised when prop validation fails at instantiation time
@@ -133,10 +124,79 @@ module Tapioca::Dsl; end
 # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:8
 module Tapioca::Dsl::Compilers; end
 
+# Generates RBI files for Phlex::Kit modules.
+#
+# When a module `extend Phlex::Kit`, Phlex installs an instance method
+# and a singleton method for every component constant added under that
+# module (see `Phlex::Kit#const_added`). Those methods render the
+# component and are invoked from inside other components like
+# `Card { ... }` or `Button(label: "Save")`.
+#
+# Sorbet only sees `Phlex::Kit#method_missing` and reports such calls as
+# unknown methods. This compiler emits a typed RBI entry for each
+# registered component so call sites type-check.
+#
+# pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:20
+class Tapioca::Dsl::Compilers::PhlexKit < ::Tapioca::Dsl::Compiler
+  extend T::Generic
+
+  ConstantType = type_member { { fixed: T::Module[T.anything] } }
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:27
+  sig { override.void }
+  def decorate; end
+
+  private
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:135
+  sig { returns(::RBI::TypedParam) }
+  def block_parameter; end
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:105
+  sig { returns(T::Hash[::Symbol, T::Module[T.anything]]) }
+  def component_constants; end
+
+  # At runtime, `Phlex::Kit#const_added` calls `constant.include(me)`
+  # on every component class added to the kit. Mirror that in RBI so
+  # the kit's instance methods are visible on the component (and on
+  # its subclasses, which inherit the include).
+  #
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:94
+  sig { params(components: T::Hash[::Symbol, T::Module[T.anything]]).void }
+  def generate_component_includes(components); end
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:45
+  sig { params(components: T::Hash[::Symbol, T::Module[T.anything]]).void }
+  def generate_kit_methods(components); end
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:120
+  sig { returns(T::Array[::RBI::TypedParam]) }
+  def kit_method_parameters; end
+
+  # Returns typed kwarg parameters when the component includes
+  # `Phlex::Sorbet` and defines a `Props` T::Struct (reusing the
+  # PhlexSorbet compiler's mapping). Falls back to an untyped
+  # `*args, **kwargs, &block` signature otherwise.
+  #
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:69
+  sig { params(component: T::Module[T.anything]).returns(T::Array[::RBI::TypedParam]) }
+  def parameters_for(component); end
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:77
+  sig { params(component: T::Module[T.anything]).returns(T.nilable(T.class_of(T::Struct))) }
+  def sorbet_props_class(component); end
+
+  class << self
+    # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_kit.rb:36
+    sig { override.returns(T::Enumerable[T::Module[T.anything]]) }
+    def gather_constants; end
+  end
+end
+
 # Generates RBI files for Phlex::Sorbet components.
 #
 # This compiler generates:
-# - Instance methods for direct prop access (user_id, notify, etc.)
+# - A typed `props` accessor returning the component's `Props` struct
 # - A typed `initialize` signature derived from the component's `Props` struct
 #
 # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:14
@@ -151,26 +211,42 @@ class Tapioca::Dsl::Compilers::PhlexSorbet < ::Tapioca::Dsl::Compiler
 
   private
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:68
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:100
   sig { returns(T::Array[::RBI::TypedParam]) }
   def build_params_signature; end
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:59
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:91
   sig { params(klass: ::RBI::Scope).void }
   def generate_initialize_method(klass); end
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:45
+  # Phlex::SGML defines an untyped `def self.new(*a, **k, &block)` that
+  # shadows `Class#new`, so without an override Sorbet ignores the typed
+  # `initialize` above. Emit a typed `self.new` so call sites are checked.
+  #
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:81
   sig { params(klass: ::RBI::Scope).void }
-  def generate_prop_accessors(klass); end
+  def generate_new_method(klass); end
 
-  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:38
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:67
+  sig { params(klass: ::RBI::Scope).void }
+  def generate_props_method(klass); end
+
+  # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:60
   sig { returns(T.nilable(T.class_of(T::Struct))) }
   def props_class; end
 
   class << self
-    # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:29
+    # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:30
     sig { override.returns(T::Enumerable[T::Module[T.anything]]) }
     def gather_constants; end
+
+    # Builds typed kwarg params from a Props T::Struct class. Returns an
+    # empty array when `props_class` is nil. Exposed as a class method so
+    # other compilers (e.g. PhlexKit) can reuse the same mapping.
+    #
+    # pkg:gem/phlex-sorbet#lib/tapioca/dsl/compilers/phlex_sorbet.rb:40
+    sig { params(props_class: T.nilable(T.class_of(T::Struct))).returns(T::Array[::RBI::TypedParam]) }
+    def params_for(props_class); end
   end
 end
 

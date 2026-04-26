@@ -7,5 +7,12 @@
   "tailwindCSS.experimental.classRegex": [
     ["[\"']?class[\"']?:\\s*\\[([^\\]]*)\\]", "[\"']([^\"']*)[\"']"],
     ["[\"']?class[\"']?:\\s*[\"']([^\"']*)[\"']"]
-  ]
+  ],
+  "files.exclude": {
+    "**/sorbet/cache": true,
+    "**/sorbet/rbi/annotations": true,
+    "**/sorbet/rbi/dsl": true,
+    "**/sorbet/rbi/gems": true,
+    "**/sorbet/rbi/shims": true
+  },
 }

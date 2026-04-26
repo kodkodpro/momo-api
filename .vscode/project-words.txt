@@ -11,6 +11,7 @@ Fren
 groupdate
 healthcheck
 hightop
+hotwired
 importmap
 jemalloc
 Kamal

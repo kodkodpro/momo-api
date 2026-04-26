@@ -6,17 +6,14 @@
 
 
 class Components::Card
-  sig { params(bordered: T::Boolean, className: T.nilable(::String)).void }
-  def initialize(bordered: T.unsafe(nil), className:); end
+  sig { params(class_name: T.nilable(::String), bordered: T::Boolean).void }
+  def initialize(class_name:, bordered: T.unsafe(nil)); end
 
-  sig { returns(T::Boolean) }
-  def bordered; end
-
-  sig { returns(T.nilable(::String)) }
-  def className; end
+  sig { returns(Components::Card::Props) }
+  def props; end
 
   class << self
-    sig { params(bordered: T::Boolean, className: T.nilable(::String)).returns(T.attached_class) }
-    def new(bordered: T.unsafe(nil), className:); end
+    sig { params(class_name: T.nilable(::String), bordered: T::Boolean).returns(T.attached_class) }
+    def new(class_name:, bordered: T.unsafe(nil)); end
   end
 end

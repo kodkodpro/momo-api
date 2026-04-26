@@ -13,6 +13,9 @@ module GeneratedUrlHelpersModule
   def analytics_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
+  def dashboard_analytics_analyze_event_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def dashboard_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
@@ -44,4 +47,13 @@ module GeneratedUrlHelpersModule
 
   sig { params(args: T.untyped).returns(String) }
   def root_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def turbo_recede_historical_location_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def turbo_refresh_historical_location_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def turbo_resume_historical_location_url(*args); end
 end

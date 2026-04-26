@@ -4,8 +4,7 @@
 class Analytics::AnalyzeEvent < ApplicationService
   # Arguments
   arg :event_name, type: Analytics::EventName
-  arg :start_date, type: T.any(Time, ActiveSupport::TimeWithZone)
-  arg :end_date, type: T.any(Time, ActiveSupport::TimeWithZone)
+  arg :period, type: Analytics::Period
   arg :group_by, type: Analytics::GroupBy
 
   # Steps
@@ -25,8 +24,9 @@ class Analytics::AnalyzeEvent < ApplicationService
   def create_data_struct
     self.analyzed_event = Analytics::AnalyzedEvent.new(
       event_name:,
-      start_date:,
-      end_date:,
+      period:,
+      start_date: period.start_date,
+      end_date: period.end_date,
       group_by:,
     )
   end
@@ -34,7 +34,7 @@ class Analytics::AnalyzeEvent < ApplicationService
   def load_events
     self.events = AnalyticsEvent.where(
       name: event_name.serialize,
-      occurred_at: start_date..end_date,
+      occurred_at: analyzed_event.start_date..analyzed_event.end_date,
     )
   end
 

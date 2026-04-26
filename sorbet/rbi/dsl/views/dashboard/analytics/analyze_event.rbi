@@ -9,8 +9,8 @@ class Views::Dashboard::Analytics::AnalyzeEvent
   sig { params(analyzed_event: ::Analytics::AnalyzedEvent).void }
   def initialize(analyzed_event:); end
 
-  sig { returns(::Analytics::AnalyzedEvent) }
-  def analyzed_event; end
+  sig { returns(Views::Dashboard::Analytics::AnalyzeEvent::Props) }
+  def props; end
 
   class << self
     sig { params(analyzed_event: ::Analytics::AnalyzedEvent).returns(T.attached_class) }
