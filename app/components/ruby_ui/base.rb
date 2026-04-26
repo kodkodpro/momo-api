@@ -9,7 +9,7 @@ class RubyUI::Base < Phlex::HTML
   attr_reader :attrs
 
   def initialize(**user_attrs)
-    super
+    super()
 
     @attrs = mix(default_attrs, user_attrs)
     @attrs[:class] = TAILWIND_MERGER.merge(@attrs[:class]) if @attrs[:class]

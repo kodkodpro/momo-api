@@ -2,24 +2,20 @@
 # frozen_string_literal: true
 
 class Analytics::AnalyzeEvent < ApplicationService
-  # Structs
-  class Data < T::Struct
-    prop :event_name, Analytics::EventName
-    prop :total_count, Integer, default: 0
-  end
-
   # Arguments
   arg :event_name, type: Analytics::EventName
-  arg :start_time, type: T.any(Time, ActiveSupport::TimeWithZone)
-  arg :end_time, type: T.any(Time, ActiveSupport::TimeWithZone)
+  arg :start_date, type: T.any(Time, ActiveSupport::TimeWithZone)
+  arg :end_date, type: T.any(Time, ActiveSupport::TimeWithZone)
+  arg :group_by, type: Analytics::GroupBy
 
   # Steps
   step :create_data_struct
   step :load_events
   step :calculate_total_count
+  step :calculate_grouped_counts
 
   # Outputs
-  output :data, type: Data
+  output :analyzed_event, type: Analytics::AnalyzedEvent
 
   private
 
@@ -27,14 +23,28 @@ class Analytics::AnalyzeEvent < ApplicationService
   attr_accessor :events
 
   def create_data_struct
-    self.data = Data.new(event_name:)
+    self.analyzed_event = Analytics::AnalyzedEvent.new(
+      event_name:,
+      start_date:,
+      end_date:,
+      group_by:,
+    )
   end
 
   def load_events
-    self.events = AnalyticsEvent.where(name: event_name, occurred_at: start_time..end_time)
+    self.events = AnalyticsEvent.where(
+      name: event_name.serialize,
+      occurred_at: start_date..end_date,
+    )
   end
 
   def calculate_total_count
-    data.total_count = events.count
+    analyzed_event.total_count = events.count
+  end
+
+  def calculate_grouped_counts
+    analyzed_event.grouped_counts = events
+      .group_by_period(group_by.serialize, :occurred_at)
+      .count
   end
 end

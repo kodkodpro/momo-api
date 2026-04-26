@@ -7,10 +7,11 @@ class Dashboard::AnalyticsController < Dashboard::ApplicationController
 
     service = Analytics::AnalyzeEvent.run!(
       event_name:,
-      start_time: 7.days.ago,
-      end_time: Time.current,
+      start_date: 28.days.ago,
+      end_date: Time.current,
+      group_by: Analytics::GroupBy::Day,
     )
 
-    render Views::Dashboard::Analytics::AnalyzeEvent.new(data: service.data)
+    render Views::Dashboard::Analytics::AnalyzeEvent.new(analyzed_event: service.analyzed_event)
   end
 end

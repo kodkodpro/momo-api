@@ -6,20 +6,20 @@
 
 
 class Analytics::AnalyzeEvent
+  sig { returns(::Analytics::AnalyzedEvent) }
+  def analyzed_event; end
+
+  sig { returns(T::Boolean) }
+  def analyzed_event?; end
+
   sig { returns(Arguments) }
   def arg; end
 
-  sig { returns(::Analytics::AnalyzeEvent::Data) }
-  def data; end
-
-  sig { returns(T::Boolean) }
-  def data?; end
-
   sig { returns(T.any(::ActiveSupport::TimeWithZone, ::Time)) }
-  def end_time; end
+  def end_date; end
 
   sig { returns(T::Boolean) }
-  def end_time?; end
+  def end_date?; end
 
   sig { returns(::Analytics::EventName) }
   def event_name; end
@@ -27,55 +27,66 @@ class Analytics::AnalyzeEvent
   sig { returns(T::Boolean) }
   def event_name?; end
 
+  sig { returns(::Analytics::GroupBy) }
+  def group_by; end
+
+  sig { returns(T::Boolean) }
+  def group_by?; end
+
   sig { returns(Outputs) }
   def output; end
 
   sig { returns(T.any(::ActiveSupport::TimeWithZone, ::Time)) }
-  def start_time; end
+  def start_date; end
 
   sig { returns(T::Boolean) }
-  def start_time?; end
+  def start_date?; end
 
   private
 
-  sig { params(value: ::Analytics::AnalyzeEvent::Data).returns(::Analytics::AnalyzeEvent::Data) }
-  def data=(value); end
+  sig { params(value: ::Analytics::AnalyzedEvent).returns(::Analytics::AnalyzedEvent) }
+  def analyzed_event=(value); end
 
   sig do
     params(
       value: T.any(::ActiveSupport::TimeWithZone, ::Time)
     ).returns(T.any(::ActiveSupport::TimeWithZone, ::Time))
   end
-  def end_time=(value); end
+  def end_date=(value); end
 
   sig { params(value: ::Analytics::EventName).returns(::Analytics::EventName) }
   def event_name=(value); end
 
+  sig { params(value: ::Analytics::GroupBy).returns(::Analytics::GroupBy) }
+  def group_by=(value); end
+
   sig do
     params(
       value: T.any(::ActiveSupport::TimeWithZone, ::Time)
     ).returns(T.any(::ActiveSupport::TimeWithZone, ::Time))
   end
-  def start_time=(value); end
+  def start_date=(value); end
 
   class << self
     sig do
       params(
         event_name: ::Analytics::EventName,
-        start_time: T.any(::ActiveSupport::TimeWithZone, ::Time),
-        end_time: T.any(::ActiveSupport::TimeWithZone, ::Time)
+        start_date: T.any(::ActiveSupport::TimeWithZone, ::Time),
+        end_date: T.any(::ActiveSupport::TimeWithZone, ::Time),
+        group_by: ::Analytics::GroupBy
       ).returns(T.attached_class)
     end
-    def run(event_name:, start_time:, end_time:); end
+    def run(event_name:, start_date:, end_date:, group_by:); end
 
     sig do
       params(
         event_name: ::Analytics::EventName,
-        start_time: T.any(::ActiveSupport::TimeWithZone, ::Time),
-        end_time: T.any(::ActiveSupport::TimeWithZone, ::Time)
+        start_date: T.any(::ActiveSupport::TimeWithZone, ::Time),
+        end_date: T.any(::ActiveSupport::TimeWithZone, ::Time),
+        group_by: ::Analytics::GroupBy
       ).returns(T.attached_class)
     end
-    def run!(event_name:, start_time:, end_time:); end
+    def run!(event_name:, start_date:, end_date:, group_by:); end
 
     sig do
       params(
@@ -88,11 +99,12 @@ class Analytics::AnalyzeEvent
 
   class Arguments < T::Struct
     prop :event_name, ::Analytics::EventName
-    prop :start_time, T.any(::ActiveSupport::TimeWithZone, ::Time)
-    prop :end_time, T.any(::ActiveSupport::TimeWithZone, ::Time)
+    prop :start_date, T.any(::ActiveSupport::TimeWithZone, ::Time)
+    prop :end_date, T.any(::ActiveSupport::TimeWithZone, ::Time)
+    prop :group_by, ::Analytics::GroupBy
   end
 
   class Outputs < T::Struct
-    prop :data, ::Analytics::AnalyzeEvent::Data
+    prop :analyzed_event, ::Analytics::AnalyzedEvent
   end
 end

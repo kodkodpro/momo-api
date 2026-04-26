@@ -9,6 +9,11 @@ class Module
 end
 
 class T::Enum # rubocop:disable Style/OneClassPerFile
+  sig { returns(String) }
+  def const_name
+    instance_variable_get(:@const_name).to_s
+  end
+
   class << self
     sig { returns(T::Array[String]) }
     def serialized_values

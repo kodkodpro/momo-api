@@ -5,6 +5,9 @@ source "https://rubygems.org"
 gem "rails", "8.1.3"
 
 gem "bootsnap", "1.23.0", require: false
+gem "chartkick", "5.2.1"
+gem "groupdate", "6.8"
+gem "hightop", "1.0"
 gem "importmap-rails", "2.2.3"
 gem "jbuilder", "2.14.1"
 gem "memery", "1.8.0"
@@ -30,6 +33,10 @@ gem "phlex-sorbet", path: "/Users/akodkod/Developer/Kodkod/phlex-sorbet"
 gem "sorbet-schema", "0.9.3"
 gem "sorbet-static-and-runtime", "0.6.13143"
 gem "tapioca", "0.18.0", require: false, group: [:development, :test]
+
+group :development do
+  gem "web-console", "4.3"
+end
 
 group :development, :test do
   gem "annotaterb", "4.22.0"

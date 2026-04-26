@@ -6,6 +6,7 @@ class Components::Card < Components::Base
 
   class Props < T::Struct
     const :bordered, T::Boolean, default: false
+    const :className, T.nilable(String)
   end
 
   def view_template
@@ -21,6 +22,7 @@ class Components::Card < Components::Base
   def card_classes
     classes = ["rounded-lg bg-card text-card-foreground shadow-sm"]
     classes << "border" if bordered
+    classes << className if className
     classes.join(" ")
   end
 end

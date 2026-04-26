@@ -6,14 +6,17 @@
 
 
 class Components::Card
-  sig { params(bordered: T::Boolean).void }
-  def initialize(bordered: T.unsafe(nil)); end
+  sig { params(bordered: T::Boolean, className: T.nilable(::String)).void }
+  def initialize(bordered: T.unsafe(nil), className:); end
 
   sig { returns(T::Boolean) }
   def bordered; end
 
+  sig { returns(T.nilable(::String)) }
+  def className; end
+
   class << self
-    sig { params(bordered: T::Boolean).returns(T.attached_class) }
-    def new(bordered: T.unsafe(nil)); end
+    sig { params(bordered: T::Boolean, className: T.nilable(::String)).returns(T.attached_class) }
+    def new(bordered: T.unsafe(nil), className:); end
   end
 end

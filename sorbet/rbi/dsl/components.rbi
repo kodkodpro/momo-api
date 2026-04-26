@@ -9,8 +9,14 @@ module Components
   sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
   def Base(*args, **kwargs, &block); end
 
-  sig { params(bordered: T::Boolean, block: T.nilable(T.proc.void)).returns(T.untyped) }
-  def Card(bordered: T.unsafe(nil), &block); end
+  sig do
+    params(
+      bordered: T::Boolean,
+      className: T.nilable(::String),
+      block: T.nilable(T.proc.void)
+    ).returns(T.untyped)
+  end
+  def Card(bordered: T.unsafe(nil), className:, &block); end
 
   sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
   def Layout(*args, **kwargs, &block); end
@@ -19,8 +25,14 @@ module Components
     sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
     def Base(*args, **kwargs, &block); end
 
-    sig { params(bordered: T::Boolean, block: T.nilable(T.proc.void)).returns(T.untyped) }
-    def Card(bordered: T.unsafe(nil), &block); end
+    sig do
+      params(
+        bordered: T::Boolean,
+        className: T.nilable(::String),
+        block: T.nilable(T.proc.void)
+      ).returns(T.untyped)
+    end
+    def Card(bordered: T.unsafe(nil), className:, &block); end
 
     sig { params(args: T.untyped, kwargs: T.untyped, block: T.nilable(T.proc.void)).returns(T.untyped) }
     def Layout(*args, **kwargs, &block); end

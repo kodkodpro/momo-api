@@ -6,14 +6,14 @@
 
 
 class Views::Dashboard::Analytics::AnalyzeEvent
-  sig { params(data: ::Analytics::AnalyzeEvent::Data).void }
-  def initialize(data:); end
+  sig { params(analyzed_event: ::Analytics::AnalyzedEvent).void }
+  def initialize(analyzed_event:); end
 
-  sig { returns(::Analytics::AnalyzeEvent::Data) }
-  def data; end
+  sig { returns(::Analytics::AnalyzedEvent) }
+  def analyzed_event; end
 
   class << self
-    sig { params(data: ::Analytics::AnalyzeEvent::Data).returns(T.attached_class) }
-    def new(data:); end
+    sig { params(analyzed_event: ::Analytics::AnalyzedEvent).returns(T.attached_class) }
+    def new(analyzed_event:); end
   end
 end

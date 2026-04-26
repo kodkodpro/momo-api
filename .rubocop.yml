@@ -113,6 +113,8 @@ Naming/MethodParameterName:
     - to
     - is
     - tz
+    - as
+    - at
 
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
