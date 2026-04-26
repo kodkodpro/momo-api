@@ -50,16 +50,14 @@ COPY . .
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
-ENV OPENAI_API_URL="1" \
-    OPENAI_API_KEY="1" \
-    ELEVENLABS_API_URL="1" \
-    ELEVENLABS_API_KEY="1" \
-    DASHBOARD_USERNAME="1" \
-    DASHBOARD_PASSWORD="1" \
-    SECRET_KEY_BASE_DUMMY="1"
+ENV SECRET_KEY_BASE_DUMMY="1"
 
-# Precompile assets for production (Propshaft + Tailwind CSS)
-RUN  bundle exec rails assets:precompile
+# Precompile assets for production (Propshaft + Tailwind CSS).
+# Load placeholder values from .env.test so initializers that read ENV vars at
+# boot don't fail during the build. The file is removed afterward so it doesn't
+# leak into the runtime image.
+RUN bundle exec dotenv -f .env.test bundle exec rails assets:precompile && \
+    rm -f .env.test
 
 
 # Final stage for app image
