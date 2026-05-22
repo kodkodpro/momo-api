@@ -2,6 +2,9 @@
 # frozen_string_literal: true
 
 class ProxyController < ApplicationController
+  # Callbacks
+  # before_action :require_active_subscription
+
   def openai
     proxy(
       base_url: Env.openai_api_url,

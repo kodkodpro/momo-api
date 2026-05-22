@@ -390,6 +390,20 @@ class User
 
     sig { params(value: T::Enumerable[::Feedback]).void }
     def feedbacks=(value); end
+
+    sig { returns(T::Array[T.untyped]) }
+    def subscription_ids; end
+
+    sig { params(ids: T::Array[T.untyped]).returns(T::Array[T.untyped]) }
+    def subscription_ids=(ids); end
+
+    # This method is created by ActiveRecord on the `User` class because it declared `has_many :subscriptions`.
+    # 🔗 [Rails guide for `has_many` association](https://guides.rubyonrails.org/association_basics.html#the-has-many-association)
+    sig { returns(::Subscription::PrivateCollectionProxy) }
+    def subscriptions; end
+
+    sig { params(value: T::Enumerable[::Subscription]).void }
+    def subscriptions=(value); end
   end
 
   module GeneratedAssociationRelationMethods

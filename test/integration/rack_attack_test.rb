@@ -19,7 +19,7 @@ class RackAttackTest < ActionDispatch::IntegrationTest
   end
 
   test "proxy/openai throttles by user id after 20 req/min" do
-    headers = auth_headers
+    headers = proxy_headers
 
     20.times do |i|
       get(proxy_openai_url(path: "v1/models"), headers:)
@@ -37,16 +37,18 @@ class RackAttackTest < ActionDispatch::IntegrationTest
   test "proxy/openai buckets are independent per user" do
     user_a = create(:user)
     user_b = create(:user)
+    headers_a = proxy_headers(user_a)
+    headers_b = proxy_headers(user_b)
 
     20.times do
-      get proxy_openai_url(path: "v1/models"), headers: auth_headers(user_a)
+      get proxy_openai_url(path: "v1/models"), headers: headers_a
       assert_response :success
     end
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers(user_a)
+    get proxy_openai_url(path: "v1/models"), headers: headers_a
     assert_response :too_many_requests
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers(user_b)
+    get proxy_openai_url(path: "v1/models"), headers: headers_b
     assert_response :success
   end
 
@@ -90,7 +92,7 @@ class RackAttackTest < ActionDispatch::IntegrationTest
   end
 
   test "throttled request notifies Sentry with the matched rule" do
-    headers = auth_headers
+    headers = proxy_headers
     capture_message_spy = Spy.on(Sentry, :capture_message)
 
     21.times { get(proxy_openai_url(path: "v1/models"), headers:) }

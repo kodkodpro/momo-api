@@ -13,7 +13,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 200, body: '{"data":[]}', headers: { "Content-Type" => "application/json" })
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), headers: proxy_headers
 
     assert_response :success
     assert_equal '{"data":[]}', response.body
@@ -28,7 +28,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
     post proxy_openai_url(path: "v1/chat/completions"),
          params: request_body,
-         headers: auth_headers.merge("Content-Type" => "application/json")
+         headers: proxy_headers.merge("Content-Type" => "application/json")
 
     assert_response :success
     assert_equal '{"choices":[]}', response.body
@@ -39,7 +39,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
       .with(headers: { "Authorization" => "Bearer #{@openai_key}" })
       .to_return(status: 200, body: "{}")
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), headers: proxy_headers
 
     assert_response :success
   end
@@ -50,7 +50,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
     put proxy_openai_url(path: "v1/some/resource"),
         params: '{"name":"test"}',
-        headers: auth_headers.merge("Content-Type" => "application/json")
+        headers: proxy_headers.merge("Content-Type" => "application/json")
 
     assert_response :success
   end
@@ -61,7 +61,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
     patch proxy_openai_url(path: "v1/some/resource"),
           params: '{"name":"test"}',
-          headers: auth_headers.merge("Content-Type" => "application/json")
+          headers: proxy_headers.merge("Content-Type" => "application/json")
 
     assert_response :success
   end
@@ -70,7 +70,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:delete, "#{@openai_base}/v1/some/resource")
       .to_return(status: 200, body: '{"deleted":true}')
 
-    delete proxy_openai_url(path: "v1/some/resource"), headers: auth_headers
+    delete proxy_openai_url(path: "v1/some/resource"), headers: proxy_headers
 
     assert_response :success
   end
@@ -80,7 +80,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
       .with(query: { "limit" => "5", "order" => "desc" })
       .to_return(status: 200, body: '{"data":[]}')
 
-    get proxy_openai_url(path: "v1/models"), params: { limit: 5, order: "desc" }, headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), params: { limit: 5, order: "desc" }, headers: proxy_headers
 
     assert_response :success
   end
@@ -89,7 +89,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 401, body: '{"error":"unauthorized"}')
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), headers: proxy_headers
 
     assert_response :unauthorized
   end
@@ -113,7 +113,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
     post proxy_openai_url(path: "v1/audio/transcriptions"),
          params: multipart_body,
-         headers: auth_headers.merge("Content-Type" => "multipart/form-data; boundary=#{boundary}")
+         headers: proxy_headers.merge("Content-Type" => "multipart/form-data; boundary=#{boundary}")
 
     assert_response :success
     assert_equal '{"text":"hello"}', response.body
@@ -123,7 +123,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 500, body: '{"error":"internal server error"}')
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), headers: proxy_headers
 
     assert_response :internal_server_error
   end
@@ -134,7 +134,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 500, body: '{"error":"internal server error"}')
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), headers: proxy_headers
 
     assert_spy_called spy
     assert_equal "OpenAI Proxy Error", spy.calls.first.args.first
@@ -146,8 +146,61 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 200, body: '{"data":[]}', headers: { "Content-Type" => "application/json" })
 
-    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+    get proxy_openai_url(path: "v1/models"), headers: proxy_headers
 
     assert_spy_not_called spy
+  end
+
+  # Subscription gate
+
+  test "returns 402 when X-iOS-Transaction-Id header is missing" do
+    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+
+    assert_response :payment_required
+    assert_match(/X-iOS-Transaction-Id header is required/, response_json["error"])
+  end
+
+  test "returns 402 when the subscription is expired" do
+    create(:subscription, :expired, user: test_user, transaction_id: "tx-expired")
+
+    get proxy_openai_url(path: "v1/models"),
+        headers: auth_headers.merge("X-iOS-Transaction-Id" => "tx-expired")
+
+    assert_response :payment_required
+    assert_match(/Subscription is not active/, response_json["error"])
+  end
+
+  test "returns 402 when the subscription is revoked" do
+    create(:subscription, :revoked, user: test_user, transaction_id: "tx-revoked")
+
+    get proxy_openai_url(path: "v1/models"),
+        headers: auth_headers.merge("X-iOS-Transaction-Id" => "tx-revoked")
+
+    assert_response :payment_required
+  end
+
+  test "allows requests when the subscription is in the grace period" do
+    create(:subscription, :in_grace_period, user: test_user, transaction_id: "tx-grace")
+
+    stub_request(:get, "#{@openai_base}/v1/models")
+      .to_return(status: 200, body: '{"data":[]}', headers: { "Content-Type" => "application/json" })
+
+    get proxy_openai_url(path: "v1/models"),
+        headers: auth_headers.merge("X-iOS-Transaction-Id" => "tx-grace")
+
+    assert_response :success
+  end
+
+  test "returns 402 when Apple returns an error during refresh" do
+    create(:subscription, :active, :stale, user: test_user, transaction_id: "tx-apple-down")
+
+    stub_request(:get, /api.storekit-sandbox.itunes.apple.com/)
+      .to_return(status: 500, body: "{}")
+
+    get proxy_openai_url(path: "v1/models"),
+        headers: auth_headers.merge("X-iOS-Transaction-Id" => "tx-apple-down")
+
+    assert_response :payment_required
+    assert_match(/Unable to verify subscription/, response_json["error"])
   end
 end

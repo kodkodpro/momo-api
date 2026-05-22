@@ -11,6 +11,7 @@ class ApplicationController < ActionController::API
 
   # Error handling
   rescue_from Fren::AuthError, with: :handle_auth_error
+  rescue_from Fren::SubscriptionError, with: :handle_subscription_error
 
   private
 
@@ -26,6 +27,18 @@ class ApplicationController < ActionController::API
   end
 
   sig { void }
+  def require_active_subscription
+    transaction_id = request.headers["X-iOS-Transaction-Id"]&.strip
+    raise Fren::SubscriptionError, "X-iOS-Transaction-Id header is required" if transaction_id.blank?
+
+    result = Subscription::CreateOrRefresh.run!(user_id: current_user.id, transaction_id:)
+    raise Fren::SubscriptionError, "Subscription is not active" unless result.subscription.entitled?
+  rescue AppStoreAPI::Error => e
+    Sentry.capture_exception(e, extra: { transaction_id:, user_id: current_user.id })
+    raise Fren::SubscriptionError, "Unable to verify subscription"
+  end
+
+  sig { void }
   def set_sentry_user
     Sentry.set_user(id: current_user.id)
   end
@@ -33,5 +46,10 @@ class ApplicationController < ActionController::API
   sig { params(error: Fren::AuthError).void }
   def handle_auth_error(error)
     render json: { status: :error, error: error.message }, status: :unauthorized
+  end
+
+  sig { params(error: Fren::SubscriptionError).void }
+  def handle_subscription_error(error)
+    render json: { status: :error, error: error.message }, status: :payment_required
   end
 end

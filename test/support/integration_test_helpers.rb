@@ -16,6 +16,15 @@ class ActionDispatch::IntegrationTest
     { "X-User-Id" => id }
   end
 
+  # Headers for requests through ProxyController. Provisions an active,
+  # fresh subscription for the user/transaction_id pair so the
+  # `require_active_subscription` callback passes without hitting Apple.
+  def proxy_headers(user = nil, transaction_id: "tx-#{SecureRandom.hex(6)}")
+    user ||= test_user
+    create(:subscription, :active, user:, transaction_id:)
+    auth_headers(user).merge("X-iOS-Transaction-Id" => transaction_id)
+  end
+
   memoize def response_json
     JSON.parse(response.body)
   end

@@ -8,7 +8,6 @@ require "rails"
 require "active_model/railtie"
 require "active_record/railtie"
 require "action_controller/railtie"
-require "action_view/railtie"
 
 # require "active_job/railtie"
 # require "active_storage/engine"
@@ -31,11 +30,11 @@ class Fren::Application < Rails::Application
   # Initialize configuration defaults
   config.load_defaults 8.1
 
-  # Load Sorbet types, structs and enums
-  config.autoload_paths << Rails.root.join("app/types")
+  # Enable API only mode
+  config.api_only = true
 
-  # Ignore autoloading for assets, tasks, and core_ext directories
-  config.autoload_lib(ignore: ["assets", "tasks", "core_ext"])
+  # Ignore autoloading for tasks and core_ext directories
+  config.autoload_lib(ignore: ["tasks", "core_ext"])
 
   # Set default log level to info
   config.log_level = :info

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_132942) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_22_104849) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -83,6 +83,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_132942) do
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
 
+  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "data", default: {}, null: false
+    t.datetime "refreshed_at", null: false
+    t.integer "status", limit: 2, null: false
+    t.string "transaction_id", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["status"], name: "index_subscriptions_on_status"
+    t.index ["transaction_id"], name: "index_subscriptions_on_transaction_id", unique: true
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
   end
@@ -91,4 +104,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_132942) do
   add_foreign_key "admin_sessions", "admins", column: "user_id", on_delete: :cascade
   add_foreign_key "analytics_events", "users"
   add_foreign_key "feedbacks", "users"
+  add_foreign_key "subscriptions", "users", on_delete: :cascade
 end

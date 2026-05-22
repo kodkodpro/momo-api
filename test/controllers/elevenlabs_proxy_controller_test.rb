@@ -13,7 +13,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@elevenlabs_base}/v1/voices")
       .to_return(status: 200, body: '{"voices":[]}', headers: { "Content-Type" => "application/json" })
 
-    get proxy_elevenlabs_url(path: "v1/voices"), headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/voices"), headers: proxy_headers
 
     assert_response :success
     assert_equal '{"voices":[]}', response.body
@@ -28,7 +28,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
 
     post proxy_elevenlabs_url(path: "v1/text-to-speech/voice_id"),
          params: request_body,
-         headers: auth_headers.merge("Content-Type" => "application/json")
+         headers: proxy_headers.merge("Content-Type" => "application/json")
 
     assert_response :success
     assert_equal "audio-bytes", response.body
@@ -39,7 +39,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
       .with(headers: { "xi-api-key" => @elevenlabs_key })
       .to_return(status: 200, body: "{}")
 
-    get proxy_elevenlabs_url(path: "v1/voices"), headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/voices"), headers: proxy_headers
 
     assert_response :success
   end
@@ -50,7 +50,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
 
     put proxy_elevenlabs_url(path: "v1/voices/voice_id/settings/edit"),
         params: '{"stability":0.5}',
-        headers: auth_headers.merge("Content-Type" => "application/json")
+        headers: proxy_headers.merge("Content-Type" => "application/json")
 
     assert_response :success
   end
@@ -61,7 +61,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
 
     patch proxy_elevenlabs_url(path: "v1/voices/voice_id"),
           params: '{"name":"test"}',
-          headers: auth_headers.merge("Content-Type" => "application/json")
+          headers: proxy_headers.merge("Content-Type" => "application/json")
 
     assert_response :success
   end
@@ -70,7 +70,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:delete, "#{@elevenlabs_base}/v1/voices/voice_id")
       .to_return(status: 200, body: '{"deleted":true}')
 
-    delete proxy_elevenlabs_url(path: "v1/voices/voice_id"), headers: auth_headers
+    delete proxy_elevenlabs_url(path: "v1/voices/voice_id"), headers: proxy_headers
 
     assert_response :success
   end
@@ -80,7 +80,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
       .with(query: { "page_size" => "10" })
       .to_return(status: 200, body: '{"history":[]}')
 
-    get proxy_elevenlabs_url(path: "v1/history"), params: { page_size: 10 }, headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/history"), params: { page_size: 10 }, headers: proxy_headers
 
     assert_response :success
   end
@@ -89,7 +89,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@elevenlabs_base}/v1/voices")
       .to_return(status: 401, body: '{"error":"unauthorized"}')
 
-    get proxy_elevenlabs_url(path: "v1/voices"), headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/voices"), headers: proxy_headers
 
     assert_response :unauthorized
   end
@@ -113,7 +113,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
 
     post proxy_elevenlabs_url(path: "v1/voices/add"),
          params: multipart_body,
-         headers: auth_headers.merge("Content-Type" => "multipart/form-data; boundary=#{boundary}")
+         headers: proxy_headers.merge("Content-Type" => "multipart/form-data; boundary=#{boundary}")
 
     assert_response :success
     assert_equal '{"voice_id":"abc123"}', response.body
@@ -123,7 +123,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@elevenlabs_base}/v1/voices")
       .to_return(status: 500, body: '{"error":"internal server error"}')
 
-    get proxy_elevenlabs_url(path: "v1/voices"), headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/voices"), headers: proxy_headers
 
     assert_response :internal_server_error
   end
@@ -134,7 +134,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@elevenlabs_base}/v1/voices")
       .to_return(status: 500, body: '{"error":"internal server error"}')
 
-    get proxy_elevenlabs_url(path: "v1/voices"), headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/voices"), headers: proxy_headers
 
     assert_spy_called spy
     assert_equal "ElevenLabs Proxy Error", spy.calls.first.args.first
@@ -146,7 +146,7 @@ class ElevenlabsProxyControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "#{@elevenlabs_base}/v1/voices")
       .to_return(status: 200, body: '{"voices":[]}', headers: { "Content-Type" => "application/json" })
 
-    get proxy_elevenlabs_url(path: "v1/voices"), headers: auth_headers
+    get proxy_elevenlabs_url(path: "v1/voices"), headers: proxy_headers
 
     assert_spy_not_called spy
   end

@@ -20,11 +20,4 @@ Rails.application.routes.draw do
 
   # Root
   root "home#index"
-
-  # Dashboard
-  namespace :dashboard do
-    root "home#index", as: ""
-
-    get "analytics/analyze-event", to: "analytics#analyze_event", as: :analytics_analyze_event
-  end
 end
