@@ -16,12 +16,12 @@ class CreatePaywalls < ActiveRecord::Migration[8.1]
       "en" => {
         title: "Upgrade to Fren Pro",
         bullets: [
-          {
-            title: "Unlimited conversations",
-            description: "Keep using Fren without limits.",
-            icon: "message-circle",
-            icon_color: "#3B82F6",
-          },
+
+          title: "Unlimited conversations",
+          description: "Keep using Fren without limits.",
+          icon: "message-circle",
+          icon_color: "#3B82F6",
+
         ],
       },
     },

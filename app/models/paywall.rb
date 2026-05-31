@@ -2,33 +2,6 @@
 # frozen_string_literal: true
 
 class Paywall < ApplicationRecord
-  # Constants
-  FALLBACK_NAME = "Default Paywall"
-  FALLBACK_DATA = T.let(
-    {
-      default_locale: "en",
-      locales: {
-        "en" => {
-          title: "Upgrade to Fren Pro",
-          bullets: [
-            {
-              title: "Unlimited conversations",
-              description: "Keep using Fren without limits.",
-              icon: "message-circle",
-              icon_color: "#3B82F6",
-            },
-          ],
-        },
-      },
-      products: [
-        {
-          apple_product_id: "fren.pro.monthly",
-        },
-      ],
-    }.freeze,
-    T::Hash[Symbol, T.untyped],
-  )
-
   # Associations
   has_many :users, dependent: :restrict_with_exception
 
@@ -63,19 +36,8 @@ class Paywall < ApplicationRecord
     T.must(paywalls.last)
   end
 
-  sig { returns(Paywall) }
-  def self.ensure_fallback!
-    find_or_create_by!(name: FALLBACK_NAME) do |paywall|
-      paywall.data = FALLBACK_DATA
-      paywall.active = true
-      paywall.weight = 1
-    end
-  end
-
   sig { params(device_language: T.nilable(String)).returns(Paywall::Data::Content) }
-  def localized_content(device_language)
-    data.localized_content(device_language)
-  end
+  delegate :localized_content, to: :data
 
   private
 

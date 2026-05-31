@@ -11,7 +11,6 @@ Dynamic paywall lets the backend assign each user a stable paywall variant and s
 - When a user is created, `User#assign_paywall` picks one active paywall with `weight > 0` using relative weighted random selection.
 - Assignment is stable: `/paywall` returns the user's assigned paywall and does not re-run rollout selection.
 - `active` and `weight` affect only future user assignment. Existing users keep their assigned paywall.
-- `Paywall.ensure_fallback!` creates the default active paywall and is called from `db/seeds.rb`.
 
 ## Data Model
 

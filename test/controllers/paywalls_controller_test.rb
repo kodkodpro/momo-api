@@ -6,7 +6,7 @@ require "test_helper"
 class PaywallsControllerTest < ActionDispatch::IntegrationTest
   test "returns assigned paywall" do
     paywall = create(:paywall)
-    user = create(:user, paywall: paywall)
+    user = create(:user, paywall:)
 
     get paywall_url, headers: auth_headers(user)
 
@@ -30,7 +30,7 @@ class PaywallsControllerTest < ActionDispatch::IntegrationTest
         products: [],
       },
     )
-    user = create(:user, paywall: paywall)
+    user = create(:user, paywall:)
 
     get paywall_url, headers: auth_headers(user).merge("X-Device-Language" => "pt-BR")
 
@@ -50,7 +50,7 @@ class PaywallsControllerTest < ActionDispatch::IntegrationTest
         products: [],
       },
     )
-    user = create(:user, paywall: paywall)
+    user = create(:user, paywall:)
 
     get paywall_url, headers: auth_headers(user).merge("X-Device-Language" => "pt-BR")
 
@@ -60,7 +60,7 @@ class PaywallsControllerTest < ActionDispatch::IntegrationTest
 
   test "falls back to english when language is missing or unsupported" do
     paywall = create(:paywall)
-    user = create(:user, paywall: paywall)
+    user = create(:user, paywall:)
 
     get paywall_url, headers: auth_headers(user).merge("X-Device-Language" => "fr-FR")
 
