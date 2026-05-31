@@ -18,7 +18,7 @@ require "action_controller/railtie"
 
 require "rails/test_unit/railtie"
 
-require_relative "initializers/sorbet"
+require_relative "initializers/0_sorbet"
 require_relative "../lib/env"
 require_relative "../lib/fren"
 

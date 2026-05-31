@@ -5,11 +5,16 @@ require "sorbet-runtime"
 require "dotenv/load"
 
 class EnvConfig < T::Struct
+  const :enable_billing, T::Boolean, default: false
+
   const :redis_url, T.nilable(String)
+
   const :openai_api_url, String
   const :openai_api_key, String
+
   const :elevenlabs_api_url, String
   const :elevenlabs_api_key, String
+
   const :sentry_dsn, T.nilable(String)
   const :sentry_environment, T.nilable(String)
 
@@ -25,7 +30,9 @@ class EnvConfig < T::Struct
   end
 end
 
-env_hash = ENV.to_h.transform_keys(&:underscore)
+env_hash = ENV.to_h
+  .transform_keys(&:underscore)
+  .transform_values(&:strip)
 
 begin
   Env = T.let(
