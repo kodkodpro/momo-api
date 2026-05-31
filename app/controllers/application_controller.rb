@@ -28,6 +28,8 @@ class ApplicationController < ActionController::API
 
   sig { void }
   def require_active_subscription
+    return unless Env.enable_billing
+
     transaction_id = request.headers["X-iOS-Transaction-Id"]&.strip
     raise Fren::SubscriptionError, "X-iOS-Transaction-Id header is required" if transaction_id.blank?
 

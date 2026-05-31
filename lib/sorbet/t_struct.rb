@@ -1,29 +1,7 @@
-# typed: strict
+# typed: true
 # frozen_string_literal: true
 
-require "sorbet-runtime"
-require "sorbet-schema"
-
-class Module
-  include T::Sig
-end
-
-class T::Enum # rubocop:disable Style/OneClassPerFile
-  sig { returns(String) }
-  def const_name
-    instance_variable_get(:@const_name).to_s
-  end
-
-  class << self
-    sig { returns(T::Array[String]) }
-    def serialized_values
-      T.bind(self, T.class_of(T::Enum))
-      values.map(&:serialize)
-    end
-  end
-end
-
-class T::Struct # rubocop:disable Style/OneClassPerFile
+class T::Struct
   class << self
     sig do
       params(
@@ -37,6 +15,16 @@ class T::Struct # rubocop:disable Style/OneClassPerFile
       raise result.error if result.failure?
 
       result.payload
+    end
+
+    sig do
+      params(
+        source: T.untyped,
+        options: T::Hash[Symbol, T.untyped],
+      ).returns(T.attached_class)
+    end
+    def from_hash!(source, options: {})
+      deserialize_from!(:hash, source, options:)
     end
   end
 

@@ -153,7 +153,19 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
   # Subscription gate
 
+  test "allows requests without a transaction id when billing is disabled" do
+    stub_request(:get, "#{@openai_base}/v1/models")
+      .to_return(status: 200, body: '{"data":[]}', headers: { "Content-Type" => "application/json" })
+
+    get proxy_openai_url(path: "v1/models"), headers: auth_headers
+
+    assert_response :success
+    assert_equal '{"data":[]}', response.body
+  end
+
   test "returns 402 when X-iOS-Transaction-Id header is missing" do
+    Spy.on(Env, :enable_billing).and_return(true)
+
     get proxy_openai_url(path: "v1/models"), headers: auth_headers
 
     assert_response :payment_required
@@ -162,6 +174,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
   test "returns 402 when the subscription is expired" do
     create(:subscription, :expired, user: test_user, transaction_id: "tx-expired")
+    Spy.on(Env, :enable_billing).and_return(true)
 
     get proxy_openai_url(path: "v1/models"),
         headers: auth_headers.merge("X-iOS-Transaction-Id" => "tx-expired")
@@ -172,6 +185,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
   test "returns 402 when the subscription is revoked" do
     create(:subscription, :revoked, user: test_user, transaction_id: "tx-revoked")
+    Spy.on(Env, :enable_billing).and_return(true)
 
     get proxy_openai_url(path: "v1/models"),
         headers: auth_headers.merge("X-iOS-Transaction-Id" => "tx-revoked")
@@ -181,6 +195,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
   test "allows requests when the subscription is in the grace period" do
     create(:subscription, :in_grace_period, user: test_user, transaction_id: "tx-grace")
+    Spy.on(Env, :enable_billing).and_return(true)
 
     stub_request(:get, "#{@openai_base}/v1/models")
       .to_return(status: 200, body: '{"data":[]}', headers: { "Content-Type" => "application/json" })
@@ -193,6 +208,7 @@ class ProxyControllerTest < ActionDispatch::IntegrationTest
 
   test "returns 402 when Apple returns an error during refresh" do
     create(:subscription, :active, :stale, user: test_user, transaction_id: "tx-apple-down")
+    Spy.on(Env, :enable_billing).and_return(true)
 
     stub_request(:get, /api.storekit-sandbox.itunes.apple.com/)
       .to_return(status: 500, body: "{}")
