@@ -37,7 +37,9 @@ class Paywall < ApplicationRecord
   end
 
   sig { params(device_language: T.nilable(String)).returns(Paywall::Data::Content) }
-  delegate :localized_content, to: :data
+  def localized_content(device_language) # rubocop:disable Rails/Delegate -- Using `delegate` crashes code
+    data.localized_content(device_language)
+  end
 
   private
 
